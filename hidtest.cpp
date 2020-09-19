@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
 	};
 
 	while (true) {
-		result = hid_read(handle, packet_buffer, 17);
+		result = hid_read(handle, packet_buffer, 17); //because the packet's length is 17 bytes now
 		if (result > 0) {
 
 			pak* recv = (pak*)packet_buffer;
