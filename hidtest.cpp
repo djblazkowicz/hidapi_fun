@@ -50,8 +50,8 @@ int main(int argc, char* argv[])
  		return 1;
 	}
 
-	int result;
-	unsigned char packet_buffer[64];
+	int result = 0;
+	uint8_t packet_buffer[64];
 	union {
 		uint8_t input[sizeof(float)];
 		float output;
@@ -72,10 +72,11 @@ int main(int argc, char* argv[])
 	struct pak {
 		uint8_t id;
 		float quat[4];
+		uint8_t rest[47];
 	};
 
 	while (true) {
-		result = hid_read(handle, packet_buffer, 17); //because the packet's length is 17 bytes now
+		result = hid_read(handle, packet_buffer, 64);
 		if (result > 0) {
 
 			pak* recv = (pak*)packet_buffer;
@@ -85,11 +86,29 @@ int main(int argc, char* argv[])
 			quat0.input[2] = packet_buffer[3];
 			quat0.input[3] = packet_buffer[4];
 
-			//float * quat = &packet_buffer[1,2,3,4]; //this does not work because hid_read() reads the packet as unsigned char array
+			quat1.input[0] = packet_buffer[5];
+			quat1.input[1] = packet_buffer[6];
+			quat1.input[2] = packet_buffer[7];
+			quat1.input[3] = packet_buffer[8];
 
-			std::cout << quat0.output << "\n";
-			std::cout << recv->quat[0] << "," << recv->quat[1] << "," << recv->quat[2] << "," << recv->quat[3] << "," << "\n";
+			quat2.input[0] = packet_buffer[9];
+			quat2.input[1] = packet_buffer[10];
+			quat2.input[2] = packet_buffer[11];
+			quat2.input[3] = packet_buffer[12];
 
+			quat3.input[0] = packet_buffer[13];
+			quat3.input[1] = packet_buffer[14];
+			quat3.input[2] = packet_buffer[15];
+			quat3.input[3] = packet_buffer[16];
+
+			std::cout << "FROM STRUCT: \n";
+			std::cout << recv->quat[0] << ", " << recv->quat[1] << ", " << recv->quat[2] << ", " << recv->quat[3] << ", " << "\n";
+			std::cout << "FROM UNION: \n";
+			std::cout << quat0.output << "," << quat1.output << "," << quat2.output << "," << quat3.output << "\n";
+
+		}
+		else {
+			std::cout << "read unsuccessful" << "\n";
 		}
 	}
 	
@@ -101,6 +120,4 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-
-
 
